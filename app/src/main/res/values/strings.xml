@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">Android Print Server</string>
+    <!-- Settings Activity Title -->
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Print Server</string>
+    <string name="sync_header">Bluetooth</string>
+
+    <string name="btn_server_start">Start Server</string>
+    <string name="btn_server_stop">Stop Server</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="usb">USB</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="check_connection">Check Connection</string>
+    <string name="esc_pos">ESC/POS</string>
+    <string name="auto_cut_paper">Auto Cut Paper</string>
+    <string name="total_char_per_line">Total Char per line</string>
+    <string name="paper_width">Paper Width</string>
+    <string name="use_bluetooth">Use Bluetooth</string>
+    <string name="use_usb">Use USB</string>
+    <string name="use_tcp_ip">Use TCP/IP</string>
+    <string name="printer_dpi">Printer Dpi</string>
+    <string name="auto_open_cash_drawer">Auto Open Cash Drawer</string>
+    <string name="print_server">Print Server</string>
+    <string name="click_start_server_to_open_print_api_at_port_5000">Click Start Server to open print API at port 5000</string>
+    <string name="start_server">Start Server</string>
+    <string name="check_printer">Test Print</string>
+    <string name="tcp_ip">TCP/IP</string>
+    <string name="printer_ip_address">Printer IP Address</string>
+    <string name="printer_port">Printer Port</string>
+    <string name="printer_timeout">Connection Timeout</string>
+    <string name="no_of_copies_to_print">No of copies to print</string>
+    <string name="number_of_copies_to_print">Number of Copies to Print</string>
+    <string name="printer_width">Printer Width</string>
+    <string name="title_activity_print">PrintActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+</resources>
