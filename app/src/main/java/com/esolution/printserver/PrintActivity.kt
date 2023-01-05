@@ -46,10 +46,12 @@ class PrintActivity : AppCompatActivity() {
                             val prefs = customPreference(this, CUSTOM_PREF_NAME)
 
                             val printController =
-                                PrintController(this, prefs.enableAutoCut, prefs.enableCashDrawer)
+                                PrintController(this, this, prefs.enableAutoCut, prefs.enableCashDrawer)
 
                             if (prefs.enableBE) {
-                                printController.print("bluetooth", apiResponse)
+                                if (printController.checkBluetoothPermission()) {
+                                    printController.print("bluetooth", apiResponse)
+                                }
                             } else if (prefs.enableUSB) {
                                 printController.print("usb", apiResponse)
                             } else if (prefs.enableTCPIP) {

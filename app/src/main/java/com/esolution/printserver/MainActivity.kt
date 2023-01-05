@@ -45,6 +45,104 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity)
 
+        this.prepareListener()
+    }
+
+    private fun streamToString(inputStream: InputStream): String {
+        val s = Scanner(inputStream).useDelimiter("\\A")
+        return if (s.hasNext()) s.next() else ""
+    }
+
+    private fun sendResponse(httpExchange: HttpExchange, responseText: String){
+        httpExchange.sendResponseHeaders(200, responseText.length.toLong())
+        val os = httpExchange.responseBody
+        os.write(responseText.toByteArray())
+        os.close()
+    }
+
+    private fun startServer(port: Int) {
+        try {
+            mHttpServer = HttpServer.create(InetSocketAddress(port), 0)
+            mHttpServer!!.executor = Executors.newCachedThreadPool()
+
+            mHttpServer!!.createContext("/", rootHandler)
+            mHttpServer!!.createContext("/index", rootHandler)
+            // Handle /messages endpoint
+            mHttpServer!!.createContext("/print", printHandler)
+            mHttpServer!!.start()//startServer server;
+
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+    }
+
+    private fun stopServer() {
+        if (mHttpServer != null){
+            mHttpServer!!.stop(0)
+        }
+    }
+
+    // Handler for root endpoint
+    private val rootHandler = HttpHandler { exchange ->
+        run {
+            // Get request method
+            when (exchange!!.requestMethod) {
+                "GET" -> {
+                    sendResponse(exchange, "Android Print Server")
+                }
+            }
+        }
+    }
+
+    private val printHandler = HttpHandler { httpExchange ->
+        run {
+            httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+
+            when (httpExchange!!.requestMethod) {
+                "OPTIONS" -> {
+                    httpExchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+                    httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers", "*")
+                    httpExchange.sendResponseHeaders(204, -1)
+                }
+                "GET" -> {
+                    // Get all messages
+                    sendResponse(httpExchange, "Would be all messages stringifies json")
+                }
+                "POST" -> {
+                    val inputStream = httpExchange.requestBody
+
+                    val requestBody = streamToString(inputStream)
+                    // val jsonBody = JSONObject(requestBody)
+                    // save message to database
+
+                    doPrint(requestBody)
+
+                    //for testing
+                    sendResponse(httpExchange, "Send Job to printer")
+                }
+            }
+        }
+    }
+
+    private fun doPrint(requestBody: String) {
+        val prefs = customPreference(this, CUSTOM_PREF_NAME)
+
+        val printController = PrintController(this, this, prefs.enableAutoCut, prefs.enableCashDrawer)
+
+        if(prefs.enableBE) {
+            if (printController.checkBluetoothPermission()) {
+                printController.print("bluetooth", requestBody)
+            }
+        } else if (prefs.enableUSB) {
+            printController.print("usb", requestBody)
+        } else if (prefs.enableTCPIP) {
+            printController.print("tcp", requestBody)
+        }
+    }
+
+    private fun prepareListener() {
         val prefs = customPreference(this, CUSTOM_PREF_NAME)
 
         val btnServerStart = findViewById<Button>(R.id.btnServerStart)
@@ -266,91 +364,6 @@ class MainActivity : AppCompatActivity() {
                 prefs.numberOfCopiesToPrint = Integer.parseInt(s.toString())
             }
         })
-    }
-
-    private fun streamToString(inputStream: InputStream): String {
-        val s = Scanner(inputStream).useDelimiter("\\A")
-        return if (s.hasNext()) s.next() else ""
-    }
-
-    private fun sendResponse(httpExchange: HttpExchange, responseText: String){
-        httpExchange.sendResponseHeaders(200, responseText.length.toLong())
-        val os = httpExchange.responseBody
-        os.write(responseText.toByteArray())
-        os.close()
-    }
-
-    private fun startServer(port: Int) {
-        try {
-            mHttpServer = HttpServer.create(InetSocketAddress(port), 0)
-            mHttpServer!!.executor = Executors.newCachedThreadPool()
-
-            mHttpServer!!.createContext("/", rootHandler)
-            mHttpServer!!.createContext("/index", rootHandler)
-            // Handle /messages endpoint
-            mHttpServer!!.createContext("/print", printHandler)
-            mHttpServer!!.start()//startServer server;
-
-
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
-    }
-
-    private fun stopServer() {
-        if (mHttpServer != null){
-            mHttpServer!!.stop(0)
-        }
-    }
-
-    // Handler for root endpoint
-    private val rootHandler = HttpHandler { exchange ->
-        run {
-            // Get request method
-            when (exchange!!.requestMethod) {
-                "GET" -> {
-                    sendResponse(exchange, "Android Print Server")
-                }
-            }
-        }
-    }
-
-    private val printHandler = HttpHandler { httpExchange ->
-        run {
-            when (httpExchange!!.requestMethod) {
-                "GET" -> {
-                    // Get all messages
-                    sendResponse(httpExchange, "Would be all messages stringifies json")
-                }
-                "POST" -> {
-                    val inputStream = httpExchange.requestBody
-
-                    val requestBody = streamToString(inputStream)
-                    val jsonBody = JSONObject(requestBody)
-                    // save message to database
-
-                    doPrint(requestBody)
-
-                    //for testing
-                    sendResponse(httpExchange, "Send Job to printer")
-                }
-            }
-        }
-    }
-
-    private fun doPrint(requestBody: String) {
-        val prefs = customPreference(this, CUSTOM_PREF_NAME)
-
-        val printController = PrintController(this, prefs.enableAutoCut, prefs.enableCashDrawer)
-
-        if(prefs.enableBE) {
-            printController.print("bluetooth", requestBody)
-        } else if (prefs.enableUSB) {
-            printController.print("usb", requestBody)
-        } else if (prefs.enableTCPIP) {
-            printController.print("tcp", requestBody)
-        }
     }
 }
 
